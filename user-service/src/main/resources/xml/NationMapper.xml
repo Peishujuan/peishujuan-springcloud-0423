@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.peishujuan.springcloud.mapper.NationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.peishujuan.springcloud.entity.Nation">
+        <result column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="district" property="district" />
+        <result column="parent" property="parent" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, code, province, city, district, parent
+    </sql>
+    <!--结果集-->
+    <resultMap id="mapVo" type="com.peishujuan.springcloud.entity.NationVo">
+        <id column="id" property="id"/>
+        <result column="provinceName" property="name"></result>
+        
+        <collection property="list" ofType="com.peishujuan.springcloud.entity.NationVo">
+            <id column="cid" property="id"/>
+            <result column="cityName" property="name"></result>
+                <collection property="list" ofType="com.peishujuan.springcloud.entity.NationVo">
+                    <id column="did" property="id"/>
+                    <result column="districtName" property="name"></result>
+                </collection>
+        </collection>
+    </resultMap>
+
+    <select id="findAll" resultMap="mapVo">
+        SELECT p.id,p.province provinceName,
+            c.id cid,c.city cityName,
+            d.id did,d.district districtName
+        FROM nation p
+        LEFT JOIN nation c
+        ON p.id=c.parent
+        LEFT JOIN nation d
+        ON c.id = d.parent
+        WHERE p.parent=1
+    </select>
+</mapper>
